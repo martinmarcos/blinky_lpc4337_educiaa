@@ -1,4 +1,4 @@
---  with "embedded-runtimes/ravenscar-lpc4337_educiaa/ravenscar_build.gpr";
+with "embedded-runtimes/ravenscar-lpc4337_educiaa/ravenscar_build.gpr";
 
 project blinky is
 
