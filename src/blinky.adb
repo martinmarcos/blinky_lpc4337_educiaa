@@ -37,8 +37,10 @@ procedure Blinky is
       SCU_Periph.SFSP2_2 (6).EZI := Enable_Input_Buffer;
       SCU_Periph.SFSP2_2 (6).MODE := Function_0_Default;
 
-      GPIO_PORT_Periph.DIR (2).Val := GPIO_PORT_Periph.DIR (2).Val or 16#1000#;
-      GPIO_PORT_Periph.CLR (2).Val := GPIO_PORT_Periph.CLR (2).Val or 16#1000#;
+      GPIO_PORT_Periph.DIR (1) := (As_Array => True,
+                                   Arr => (12 => 1, others => <>));
+      GPIO_PORT_Periph.CLR (1) := (As_Array => True,
+                                   Arr => (12 => 1, others => <>));
 
    end Initialize_LEDs;
 
@@ -48,12 +50,12 @@ begin
 
    loop
       --  Toggle (All_LEDs);
-      if (GPIO_PORT_Periph.SET (2).Val or 16#1000#) = 16#1000# then
-         GPIO_PORT_Periph.CLR (2).Val :=
-                                 GPIO_PORT_Periph.CLR (2).Val or 16#1000#;
+      if GPIO_PORT_Periph.SET (1).Arr (12) = 1 then
+         GPIO_PORT_Periph.CLR (1) := (As_Array => True,
+                                      Arr => (12 => 1, others => <>));
       else
-         GPIO_PORT_Periph.SET (2).Val :=
-                                 GPIO_PORT_Periph.CLR (2).Val or 16#1000#;
+         GPIO_PORT_Periph.SET (1) := (As_Array => True,
+                                      Arr => (12 => 1, others => <>));
       end if;
 
       Next_Release := Next_Release + Period;
