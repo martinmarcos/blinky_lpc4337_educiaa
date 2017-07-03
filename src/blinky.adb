@@ -15,6 +15,8 @@ procedure Blinky is
 
    Next_Release : Time := Clock;
 
+   LED3 : SFS_Register_Access;
+
    procedure Initialize_LEDs;
    --  Enables the clock and configures the GPIO pins and port connected to the
    --  LEDs on the target board so that we can drive them via GPIO commands.
@@ -33,9 +35,11 @@ procedure Blinky is
       --  Configuration.Resistors   := Floating;
       --  Configure_IO (All_LEDs, Configuration);
 
-      SCU_Periph.SFSP2_2 (6).EPUN := Enable_Pull_Up;
-      SCU_Periph.SFSP2_2 (6).EZI := Enable_Input_Buffer;
-      SCU_Periph.SFSP2_2 (6).MODE := Function_0_Default;
+      LED3 := SCU_Periph.SFSP2.Pins_6_13 (12)'Access;
+
+      LED3.EPUN := Enable_Pull_Up;
+      LED3.EZI  := Enable_Input_Buffer;
+      LED3.MODE := Function_0_Default;
 
       GPIO_PORT_Periph.DIR (1) := (As_Array => True,
                                    Arr => (12 => 1, others => <>));
