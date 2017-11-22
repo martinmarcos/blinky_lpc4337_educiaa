@@ -1,5 +1,3 @@
-with "embedded-runtimes/ravenscar-lpc4337_educiaa/ravenscar_build.gpr";
-
 project blinky is
 
    for Target use "arm-eabi";
@@ -16,9 +14,9 @@ project blinky is
 
    case RTS is
       when "ravenscar-sfp" =>
-         for Runtime ("Ada") use Project'project_dir&"embedded-runtimes/ravenscar-lpc4337_educiaa/sfp";
+         for Runtime ("Ada") use "ravenscar-sfp-lpc43";
       when "ravenscar-full" =>
-         for Runtime ("Ada") use Project'project_dir&"embedded-runtimes/ravenscar-lpc4337_educiaa/full";
+         for Runtime ("Ada") use "ravenscar-full-lpc43";
    end case;
 
    type BUILD_TYPE is ("Debug", "Production");
@@ -34,7 +32,7 @@ project blinky is
               ("-g", "-O0", "-gnata", "-fcallgraph-info=su");
       end case;
       for Default_Switches ("ada") use Compiler'Default_Switches ("Ada") &
-        ("-gnatwa", "-gnatwe", "-gnatQ", "-gnatw.X", "-gnaty", "-gnatyO",
+        ("-gnatwa", "-gnatwI", "-gnatwe", "-gnatQ", "-gnatw.X", "-gnaty", "-gnatyO",
          "-gnatyM120", "-ffunction-sections", "-fdata-sections");
    end Compiler;
 
@@ -51,6 +49,8 @@ project blinky is
    package Ide is
       for Gnat use "arm-eabi-gnat";
       for Gnatlist use "arm-eabi-gnatls";
+      for Connection_Tool use "openocd";
+      for Connection_Config_File use "edu-ciaa-nxp.cfg";
       for Debugger_Command use "arm-eabi-gdb";
       for Program_Host use "localhost:3333";
       for Communication_Protocol use "remote";

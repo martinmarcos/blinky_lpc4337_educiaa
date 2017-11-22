@@ -1,4 +1,0 @@
-[submodule "blinky_ada_educiaa"]
-	path = embedded-runtimes
-	url = https://github.com/martinmarcos/embedded-runtimes
-	branch = edu-ciaa-nxp
