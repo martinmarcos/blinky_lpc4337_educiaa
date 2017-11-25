@@ -32,7 +32,7 @@ project blinky is
               ("-g", "-O0", "-gnata", "-fcallgraph-info=su");
       end case;
       for Default_Switches ("ada") use Compiler'Default_Switches ("Ada") &
-        ("-gnatwa", "-gnatwI", "-gnatwe", "-gnatQ", "-gnatw.X", "-gnaty", "-gnatyO",
+        ("-gnatwa", "-gnatwe", "-gnatQ", "-gnatw.X", "-gnaty", "-gnatyO",
          "-gnatyM120", "-ffunction-sections", "-fdata-sections");
    end Compiler;
 
