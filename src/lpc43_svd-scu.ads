@@ -1,3 +1,7 @@
+--
+--  Copyright (C) 2017, AdaCore
+--
+
 --  This spec has been automatically generated from LPC43xx_43Sxx.svd
 
 pragma Restrictions (No_Elaboration_Code);
@@ -14,7 +18,7 @@ package LPC43_SVD.SCU is
    ---------------
 
    --  Select pin function.
-   type SFSP0_ENUM is
+   type MODE_ENUM is
      (
       --  Function 0 (default)
       Function_0_Default,
@@ -33,7 +37,7 @@ package LPC43_SVD.SCU is
       --  Function 7
       Function_7)
      with Size => 3;
-   for SFSP0_ENUM use
+   for MODE_ENUM use
      (Function_0_Default => 0,
       Function_1 => 1,
       Function_2 => 2,
@@ -44,7 +48,7 @@ package LPC43_SVD.SCU is
       Function_7 => 7);
 
    --  Enable pull-down resistor at pad.
-   type SFSP0_ENUM_1 is
+   type EPD_ENUM is
      (
       --  Disable pull-down.
       Disable_Pull_Down,
@@ -52,13 +56,13 @@ package LPC43_SVD.SCU is
       --  for repeater mode.
       Enable_Pull_Down)
      with Size => 1;
-   for SFSP0_ENUM_1 use
+   for EPD_ENUM use
      (Disable_Pull_Down => 0,
       Enable_Pull_Down => 1);
 
    --  Disable pull-up resistor at pad. By default, the pull-up resistor is
    --  enabled at reset.
-   type SFSP0_ENUM_2 is
+   type EPUN_ENUM is
      (
       --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
       --  for repeater mode.
@@ -66,2735 +70,230 @@ package LPC43_SVD.SCU is
       --  Disable pull-up.
       Disable_Pull_Up)
      with Size => 1;
-   for SFSP0_ENUM_2 use
+   for EPUN_ENUM use
      (Enable_Pull_Up => 0,
       Disable_Pull_Up => 1);
 
    --  Select Slew rate.
-   type SFSP0_ENUM_3 is
+   type EHS_ENUM is
      (
       --  Slow (low noise with medium speed)
       Slow_Low_Noise_With,
       --  Fast (medium noise with fast speed)
       Fast_Medium_Noise_W)
      with Size => 1;
-   for SFSP0_ENUM_3 use
+   for EHS_ENUM use
      (Slow_Low_Noise_With => 0,
       Fast_Medium_Noise_W => 1);
 
    --  Input buffer enable. The input buffer is disabled by default at reset
    --  and must be enabled for receiving.
-   type SFSP0_ENUM_4 is
+   type EZI_ENUM is
      (
       --  Disable input buffer
       Disable_Input_Buffer,
       --  Enable input buffer
       Enable_Input_Buffer)
      with Size => 1;
-   for SFSP0_ENUM_4 use
+   for EZI_ENUM use
      (Disable_Input_Buffer => 0,
       Enable_Input_Buffer => 1);
 
    --  Input glitch filter. Disable the input glitch filter for clocking
    --  signals higher than 30 MHz.
-   type SFSP0_ENUM_5 is
+   type ZIF_ENUM is
      (
       --  Enable input glitch filter
       Enable_Input_Glitch,
       --  Disable input glitch filter
       Disable_Input_Glitch)
      with Size => 1;
-   for SFSP0_ENUM_5 use
+   for ZIF_ENUM use
      (Enable_Input_Glitch => 0,
       Disable_Input_Glitch => 1);
 
-   subtype SFSP0_RESERVED_Field is LPC43_SVD.UInt24;
+   --  Select drive strength.
+   type EHD_ENUM is
+     (
+      --  Normal-drive: 4 mA drive strength
+      Normal_Drive_4_Ma_D,
+      --  Medium-drive: 8 mA drive strength
+      Medium_Drive_8_Ma_D,
+      --  High-drive: 14 mA drive strength
+      High_Drive_14_Ma_Dr,
+      --  Ultra high-drive: 20 mA drive strength
+      Ultra_High_Drive_20)
+     with Size => 2;
+   for EHD_ENUM use
+     (Normal_Drive_4_Ma_D => 0,
+      Medium_Drive_8_Ma_D => 1,
+      High_Drive_14_Ma_Dr => 2,
+      Ultra_High_Drive_20 => 3);
+
+   type Pin_Type is (Normal_Drive, High_Drive, High_Speed);
+
+   --  Pin configuration register
+   type SFS_Register(Pin : Pin_Type := Normal_Drive) is record
+
+      --  Select pin function.
+      MODE     : MODE_ENUM := LPC43_SVD.SCU.Function_0_Default;
+
+      --  Enable pull-down resistor at pad.
+      EPD      : EPD_ENUM := LPC43_SVD.SCU.Disable_Pull_Down;
+
+      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
+      --  enabled at reset.
+      EPUN     : EPUN_ENUM := LPC43_SVD.SCU.Enable_Pull_Up;
+
+      --  Input buffer enable. The input buffer is disabled by default
+      --  at reset and must be enabled for receiving.
+      EZI      : EZI_ENUM := LPC43_SVD.SCU.Disable_Input_Buffer;
+
+      --  Input glitch filter. Disable the input glitch filter for
+      --  clocking signals higher than 30 MHz.
+      ZIF      : ZIF_ENUM := LPC43_SVD.SCU.Enable_Input_Glitch;
+
+      --  Reserved
+      RESERVED     : LPC43_SVD.UInt22 := 16#0#;
+
+      case Pin is
+         when Normal_Drive =>
+
+            --  Reserved
+            ND_EHS_RESERVED : LPC43_SVD.Bit := 16#0#;
+            --  Reserved
+            ND_EHD_RESERVED : LPC43_SVD.UInt2 := 16#0#;
+
+         when High_Drive =>
+
+            --  Select drive strength.
+            EHD : EHD_ENUM := LPC43_SVD.SCU.Normal_Drive_4_Ma_D;
+            --  Reserved
+            HD_EHS_RESERVED : LPC43_SVD.Bit := 16#0#;
+
+         when High_Speed =>
+
+            --  Select Slew rate.
+            EHS    : EHS_ENUM := LPC43_SVD.SCU.Slow_Low_Noise_With;
+            --  Reserved
+            HS_EHD_RESERVED : LPC43_SVD.UInt2 := 16#0#;
+
+      end case;
+   end record
+     with Unchecked_Union, Size => 32, Volatile_Full_Access,
+          Bit_Order => System.Low_Order_First;
+
+   for SFS_Register use record
+      MODE            at 0 range 0 .. 2;
+      EPD             at 0 range 3 .. 3;
+      EPUN            at 0 range 4 .. 4;
+      ND_EHS_RESERVED at 0 range 5 .. 5;
+      HD_EHS_RESERVED at 0 range 5 .. 5;
+      EHS             at 0 range 5 .. 5;
+      EZI             at 0 range 6 .. 6;
+      ZIF             at 0 range 7 .. 7;
+      ND_EHD_RESERVED at 0 range 8 .. 9;
+      EHD             at 0 range 8 .. 9;
+      HS_EHD_RESERVED at 0 range 8 .. 9;
+      RESERVED        at 0 range 10 .. 31;
+   end record;
+
+   type SFS_Register_Access is access all SFS_Register;
+
+   type Normal_Drive_Pins is array (Integer range <>)
+     of aliased SFS_Register(Normal_Drive);
+
+   type High_Drive_Pins is array (Integer range <>)
+     of aliased SFS_Register(High_Drive);
+
+   type High_Speed_Pins is array (Integer range <>)
+     of aliased SFS_Register(High_Speed);
 
    --  Pin configuration register for pins P0
-   type SFSP0_Register is record
-      --  Select pin function.
-      MODE     : SFSP0_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP0_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP0_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSP0_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP0_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP0_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSP0_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP0_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P0
-   type SFSP0_Registers is array (0 .. 1) of SFSP0_Register
+   type SFSP0_Registers is array (0 .. 1) of aliased SFS_Register(Normal_Drive)
      with Volatile;
-
-   --  Select pin function.
-   type SFSP1_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP1_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSP1_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP1_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP1_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP1_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSP1_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSP1_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSP1_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP1_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSP1_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSP1_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSP1_RESERVED_Field is LPC43_SVD.UInt24;
 
    --  Pin configuration register for pins P1
-   type SFSP1_Register is record
-      --  Select pin function.
-      MODE     : SFSP1_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP1_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP1_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSP1_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP1_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP1_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSP1_RESERVED_Field := 16#0#;
+   type SFSP1_Registers is record
+      Pins_0_16 : Normal_Drive_Pins (0 .. 16);
+      Pin17 : High_Drive_Pins (17 .. 17);
+      Pins_18_20 : Normal_Drive_Pins (18 .. 20);
    end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP1_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P1
-   type SFSP1_Registers is array (0 .. 16) of SFSP1_Register
      with Volatile;
 
-   --  Select pin function.
-   type SFSP1_17_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP1_17_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSP1_17_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP1_17_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP1_17_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP1_17_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  but must be enabled to transfer data from the I/O buffer to the pad.
-   type SFSP1_17_ENUM_3 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP1_17_ENUM_3 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSP1_17_ENUM_4 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSP1_17_ENUM_4 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   --  Select drive strength.
-   type SFSP1_17_ENUM_5 is
-     (
-      --  Normal-drive: 4 mA drive strength
-      Normal_Drive_4_Ma_D,
-      --  Medium-drive: 8 mA drive strength
-      Medium_Drive_8_Ma_D,
-      --  High-drive: 14 mA drive strength
-      High_Drive_14_Ma_Dr,
-      --  Ultra high-drive: 20 mA drive strength
-      Ultra_High_Drive_20)
-     with Size => 2;
-   for SFSP1_17_ENUM_5 use
-     (Normal_Drive_4_Ma_D => 0,
-      Medium_Drive_8_Ma_D => 1,
-      High_Drive_14_Ma_Dr => 2,
-      Ultra_High_Drive_20 => 3);
-
-   subtype SFSP1_17_RESERVED_Field is LPC43_SVD.UInt22;
-
-   --  Pin configuration register for pins P1_17
-   type SFSP1_17_Register is record
-      --  Select pin function.
-      MODE       : SFSP1_17_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD        : SFSP1_17_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN       : SFSP1_17_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Reserved
-      RESERVED   : Boolean := False;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  but must be enabled to transfer data from the I/O buffer to the pad.
-      EZI        : SFSP1_17_ENUM_3 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF        : SFSP1_17_ENUM_4 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Select drive strength.
-      EHD        : SFSP1_17_ENUM_5 := LPC43_SVD.SCU.Normal_Drive_4_Ma_D;
-      --  Reserved
-      RESERVED_1 : SFSP1_17_RESERVED_Field := 16#0#;
+   --  Pin configuration register for pins P2
+   type SFSP2_Registers is record
+      Pins_0_2 : Normal_Drive_Pins (0 .. 2);
+      Pins_3_5 : High_Drive_Pins (3 .. 5);
+      Pins_6_13 : Normal_Drive_Pins (6 .. 13);
    end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP1_17_Register use record
-      MODE       at 0 range 0 .. 2;
-      EPD        at 0 range 3 .. 3;
-      EPUN       at 0 range 4 .. 4;
-      RESERVED   at 0 range 5 .. 5;
-      EZI        at 0 range 6 .. 6;
-      ZIF        at 0 range 7 .. 7;
-      EHD        at 0 range 8 .. 9;
-      RESERVED_1 at 0 range 10 .. 31;
-   end record;
-
-   subtype SFSP_RESERVED_Field is LPC43_SVD.UInt24;
-
-   --  Pin configuration register for pins P1
-   type SFSP_Register is record
-      --  Select pin function.
-      MODE     : SFSP1_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP1_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP1_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSP1_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP1_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP1_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSP_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P1
-   type SFSP_Registers is array (0 .. 2) of SFSP_Register
      with Volatile;
-
-   --  Select pin function.
-   type SFSP2_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP2_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSP2_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP2_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP2_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP2_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  but must be enabled to transfer data from the I/O buffer to the pad.
-   type SFSP2_ENUM_3 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP2_ENUM_3 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSP2_ENUM_4 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSP2_ENUM_4 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   --  Select drive strength.
-   type SFSP2_ENUM_5 is
-     (
-      --  Normal-drive: 4 mA drive strength
-      Normal_Drive_4_Ma_D,
-      --  Medium-drive: 8 mA drive strength
-      Medium_Drive_8_Ma_D,
-      --  High-drive: 14 mA drive strength
-      High_Drive_14_Ma_Dr,
-      --  Ultra high-drive: 20 mA drive strength
-      Ultra_High_Drive_20)
-     with Size => 2;
-   for SFSP2_ENUM_5 use
-     (Normal_Drive_4_Ma_D => 0,
-      Medium_Drive_8_Ma_D => 1,
-      High_Drive_14_Ma_Dr => 2,
-      Ultra_High_Drive_20 => 3);
-
-   subtype SFSP2_RESERVED_Field is LPC43_SVD.UInt22;
-
-   --  Pin configuration register for pins P2
-   type SFSP2_Register is record
-      --  Select pin function.
-      MODE       : SFSP2_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD        : SFSP2_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN       : SFSP2_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Reserved
-      RESERVED   : Boolean := False;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  but must be enabled to transfer data from the I/O buffer to the pad.
-      EZI        : SFSP2_ENUM_3 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF        : SFSP2_ENUM_4 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Select drive strength.
-      EHD        : SFSP2_ENUM_5 := LPC43_SVD.SCU.Normal_Drive_4_Ma_D;
-      --  Reserved
-      RESERVED_1 : SFSP2_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP2_Register use record
-      MODE       at 0 range 0 .. 2;
-      EPD        at 0 range 3 .. 3;
-      EPUN       at 0 range 4 .. 4;
-      RESERVED   at 0 range 5 .. 5;
-      EZI        at 0 range 6 .. 6;
-      ZIF        at 0 range 7 .. 7;
-      EHD        at 0 range 8 .. 9;
-      RESERVED_1 at 0 range 10 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P2
-   type SFSP2_Registers is array (0 .. 2) of SFSP2_Register
-     with Volatile;
-
-   --  Select Slew rate.
-   type SFSP2_ENUM_6 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSP2_ENUM_6 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   subtype SFSP2_RESERVED_Field_1 is LPC43_SVD.UInt24;
-
-   --  Pin configuration register for pins P2
-   type SFSP2_Register_1 is record
-      --  Select pin function.
-      MODE     : SFSP2_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP2_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP2_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSP2_ENUM_6 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP2_ENUM_3 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP2_ENUM_4 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSP2_RESERVED_Field_1 := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP2_Register_1 use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P2
-   type SFSP2_Registers_1 is array (0 .. 6) of SFSP2_Register_1
-     with Volatile;
-
-   --  Select pin function.
-   type SFSP3_3_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP3_3_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSP3_3_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP3_3_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP3_3_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP3_3_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Slew rate
-   type SFSP3_3_ENUM_3 is
-     (
-      --  Fast (low noise with fast speed)
-      Fast_Low_Noise_With,
-      --  High-speed (medium noise with high speed)
-      High_Speed_Medium_N)
-     with Size => 1;
-   for SFSP3_3_ENUM_3 use
-     (Fast_Low_Noise_With => 0,
-      High_Speed_Medium_N => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSP3_3_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP3_3_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSP3_3_ENUM_5 is
-     (
-      --  Enable input filter
-      Enable_Input_Filter,
-      --  Disable input filter
-      Disable_Input_Filter)
-     with Size => 1;
-   for SFSP3_3_ENUM_5 use
-     (Enable_Input_Filter => 0,
-      Disable_Input_Filter => 1);
-
-   subtype SFSP3_3_RESERVED_Field is LPC43_SVD.UInt24;
 
    --  Pin configuration register for pins P3
-   type SFSP3_3_Register is record
-      --  Select pin function.
-      MODE     : SFSP3_3_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP3_3_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP3_3_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Slew rate
-      EHS      : SFSP3_3_ENUM_3 := LPC43_SVD.SCU.Fast_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP3_3_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP3_3_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Filter;
-      --  Reserved
-      RESERVED : SFSP3_3_RESERVED_Field := 16#0#;
+   type SFSP3_Registers is record
+      Pins_0_2 : Normal_Drive_Pins (0 .. 2);
+      Pin3 : High_Speed_Pins (3 .. 3);
+      Pins_4_8 : Normal_Drive_Pins (4 .. 8);
    end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP3_3_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Select pin function.
-   type SFSP3_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP3_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSP3_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP3_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP3_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP3_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSP3_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSP3_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSP3_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP3_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSP3_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSP3_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSP3_RESERVED_Field is LPC43_SVD.UInt24;
-
-   --  Pin configuration register for pins P3
-   type SFSP3_Register is record
-      --  Select pin function.
-      MODE     : SFSP3_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP3_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP3_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSP3_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP3_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP3_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSP3_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP3_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P3
-   type SFSP3_Registers is array (0 .. 4) of SFSP3_Register
      with Volatile;
-
-   --  Select pin function.
-   type SFSP4_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP4_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSP4_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP4_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP4_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP4_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSP4_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSP4_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSP4_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP4_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSP4_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSP4_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSP4_RESERVED_Field is LPC43_SVD.UInt24;
 
    --  Pin configuration register for pins P4
-   type SFSP4_Register is record
-      --  Select pin function.
-      MODE     : SFSP4_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP4_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP4_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSP4_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP4_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP4_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSP4_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP4_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P4
-   type SFSP4_Registers is array (0 .. 10) of SFSP4_Register
+   type SFSP4_Registers is array (0 .. 10) of aliased SFS_Register(Normal_Drive)
      with Volatile;
-
-   --  Select pin function.
-   type SFSP5_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP5_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSP5_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP5_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP5_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP5_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSP5_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSP5_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSP5_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP5_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSP5_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSP5_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
 
    --  Pin configuration register for pins P5
-   type SFSP_Register_1 is record
-      --  Select pin function.
-      MODE     : SFSP5_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP5_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP5_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSP5_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP5_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP5_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSP_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP_Register_1 use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P5
-   type SFSP_Registers_1 is array (0 .. 7) of SFSP_Register_1
+   type SFSP5_Registers is array (0 .. 7) of aliased SFS_Register(Normal_Drive)
      with Volatile;
-
-   --  Select pin function.
-   type SFSP6_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP6_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSP6_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP6_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP6_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP6_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSP6_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSP6_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSP6_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP6_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSP6_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSP6_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSP6_RESERVED_Field is LPC43_SVD.UInt24;
 
    --  Pin configuration register for pins P6
-   type SFSP6_Register is record
-      --  Select pin function.
-      MODE     : SFSP6_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP6_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP6_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSP6_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP6_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP6_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSP6_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP6_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P6
-   type SFSP6_Registers is array (0 .. 12) of SFSP6_Register
+   type SFSP6_Registers is array (0 .. 12) of aliased SFS_Register(Normal_Drive)
      with Volatile;
 
-   --  Select pin function.
-   type SFSP8_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP8_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSP8_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP8_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP8_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP8_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSP8_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSP8_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSP8_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP8_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSP8_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSP8_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSP8_RESERVED_Field is LPC43_SVD.UInt24;
+   --  Pin configuration register for pins P7
+   type SFSP7_Registers is array (0 .. 7) of aliased SFS_Register(Normal_Drive)
+     with Volatile;
 
    --  Pin configuration register for pins P8
-   type SFSP8_Register is record
-      --  Select pin function.
-      MODE     : SFSP8_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSP8_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSP8_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSP8_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSP8_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSP8_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSP8_RESERVED_Field := 16#0#;
+   type SFSP8_Registers is record
+      Pins_0_2 : High_Drive_Pins (0 .. 2);
+      Pins_3_8 : Normal_Drive_Pins (3 .. 8);
    end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP8_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P8
-   type SFSP8_Registers is array (0 .. 5) of SFSP8_Register
      with Volatile;
-
-   --  Select pin function
-   type SFSP9_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSP9_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad
-   type SFSP9_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSP9_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSP9_ENUM_2 is
-     (
-      --  Enable pull-up
-      Enable_Pull_Up,
-      --  Disable pull-up
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSP9_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Slew rate
-   type SFSP9_ENUM_3 is
-     (
-      --  Slow
-      Slow,
-      --  Fast
-      Fast)
-     with Size => 1;
-   for SFSP9_ENUM_3 use
-     (Slow => 0,
-      Fast => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  but must be enabled to transfer data from the I/O buffer to the pad.
-   type SFSP9_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSP9_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Select drive strength
-   type SFSP9_ENUM_5 is
-     (
-      --  Standard drive: 4 mA drive strength
-      Standard_Drive_4_Ma,
-      --  Medium drive: 8 mA drive strength
-      Medium_Drive_8_Ma_D,
-      --  High drive: 14 mA drive strength
-      High_Drive_14_Ma_Dr,
-      --  Ultra-high drive: 20 mA drive strength
-      Ultra_High_Drive_20)
-     with Size => 2;
-   for SFSP9_ENUM_5 use
-     (Standard_Drive_4_Ma => 0,
-      Medium_Drive_8_Ma_D => 1,
-      High_Drive_14_Ma_Dr => 2,
-      Ultra_High_Drive_20 => 3);
-
-   subtype SFSP9_RESERVED_Field is LPC43_SVD.UInt22;
 
    --  Pin configuration register for pins P9
-   type SFSP9_Register is record
-      --  Select pin function
-      MODE       : SFSP9_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad
-      EPD        : SFSP9_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN       : SFSP9_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Slew rate
-      EHS        : SFSP9_ENUM_3 := LPC43_SVD.SCU.Slow;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  but must be enabled to transfer data from the I/O buffer to the pad.
-      EZI        : SFSP9_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Reserved
-      RESERVED   : Boolean := False;
-      --  Select drive strength
-      EHD        : SFSP9_ENUM_5 := LPC43_SVD.SCU.Standard_Drive_4_Ma;
-      --  Reserved
-      RESERVED_1 : SFSP9_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSP9_Register use record
-      MODE       at 0 range 0 .. 2;
-      EPD        at 0 range 3 .. 3;
-      EPUN       at 0 range 4 .. 4;
-      EHS        at 0 range 5 .. 5;
-      EZI        at 0 range 6 .. 6;
-      RESERVED   at 0 range 7 .. 7;
-      EHD        at 0 range 8 .. 9;
-      RESERVED_1 at 0 range 10 .. 31;
-   end record;
-
-   --  Pin configuration register for pins P9
-   type SFSP9_Registers is array (0 .. 6) of SFSP9_Register
+   type SFSP9_Registers is array (0 .. 6) of aliased SFS_Register(Normal_Drive)
      with Volatile;
 
-   --  Select pin function.
-   type SFSPA_0_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSPA_0_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSPA_0_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSPA_0_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSPA_0_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSPA_0_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSPA_0_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSPA_0_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSPA_0_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSPA_0_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSPA_0_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSPA_0_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSPA_0_RESERVED_Field is LPC43_SVD.UInt24;
-
    --  Pin configuration register for pins PA
-   type SFSPA_0_Register is record
-      --  Select pin function.
-      MODE     : SFSPA_0_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSPA_0_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSPA_0_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSPA_0_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSPA_0_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSPA_0_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSPA_0_RESERVED_Field := 16#0#;
+   type SFSPA_Registers is record
+      Pin0 : Normal_Drive_Pins (0 .. 0);
+      Pins_1_3 : High_Speed_Pins (1 .. 3);
+      Pin4 : Normal_Drive_Pins (4 .. 4);
    end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSPA_0_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Select pin function.
-   type SFSPA_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSPA_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSPA_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSPA_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSPA_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSPA_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  but must be enabled to transfer data from the I/O buffer to the pad.
-   type SFSPA_ENUM_3 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSPA_ENUM_3 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSPA_ENUM_4 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSPA_ENUM_4 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   --  Select drive strength.
-   type SFSPA_ENUM_5 is
-     (
-      --  Normal-drive: 4 mA drive strength
-      Normal_Drive_4_Ma_D,
-      --  Medium-drive: 8 mA drive strength
-      Medium_Drive_8_Ma_D,
-      --  High-drive: 14 mA drive strength
-      High_Drive_14_Ma_Dr,
-      --  Ultra high-drive: 20 mA drive strength
-      Ultra_High_Drive_20)
-     with Size => 2;
-   for SFSPA_ENUM_5 use
-     (Normal_Drive_4_Ma_D => 0,
-      Medium_Drive_8_Ma_D => 1,
-      High_Drive_14_Ma_Dr => 2,
-      Ultra_High_Drive_20 => 3);
-
-   subtype SFSPA_RESERVED_Field is LPC43_SVD.UInt22;
-
-   --  Pin configuration register for pins PA
-   type SFSPA_Register is record
-      --  Select pin function.
-      MODE       : SFSPA_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD        : SFSPA_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN       : SFSPA_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Reserved
-      RESERVED   : Boolean := False;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  but must be enabled to transfer data from the I/O buffer to the pad.
-      EZI        : SFSPA_ENUM_3 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF        : SFSPA_ENUM_4 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Select drive strength.
-      EHD        : SFSPA_ENUM_5 := LPC43_SVD.SCU.Normal_Drive_4_Ma_D;
-      --  Reserved
-      RESERVED_1 : SFSPA_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSPA_Register use record
-      MODE       at 0 range 0 .. 2;
-      EPD        at 0 range 3 .. 3;
-      EPUN       at 0 range 4 .. 4;
-      RESERVED   at 0 range 5 .. 5;
-      EZI        at 0 range 6 .. 6;
-      ZIF        at 0 range 7 .. 7;
-      EHD        at 0 range 8 .. 9;
-      RESERVED_1 at 0 range 10 .. 31;
-   end record;
-
-   --  Pin configuration register for pins PA
-   type SFSPA_Registers is array (0 .. 2) of SFSPA_Register
      with Volatile;
-
-   --  Select pin function.
-   type SFSPA_4_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSPA_4_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSPA_4_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSPA_4_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSPA_4_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSPA_4_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSPA_4_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSPA_4_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSPA_4_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSPA_4_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSPA_4_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSPA_4_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSPA_4_RESERVED_Field is LPC43_SVD.UInt24;
-
-   --  Pin configuration register for pins PA
-   type SFSPA_4_Register is record
-      --  Select pin function.
-      MODE     : SFSPA_4_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSPA_4_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSPA_4_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSPA_4_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSPA_4_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSPA_4_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSPA_4_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSPA_4_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Select pin function.
-   type SFSPB_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSPB_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSPB_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSPB_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSPB_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSPB_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSPB_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSPB_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSPB_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSPB_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSPB_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSPB_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSPB_RESERVED_Field is LPC43_SVD.UInt24;
 
    --  Pin configuration register for pins PB
-   type SFSPB_Register is record
-      --  Select pin function.
-      MODE     : SFSPB_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSPB_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSPB_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSPB_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSPB_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSPB_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSPB_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSPB_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins PB
-   type SFSPB_Registers is array (0 .. 6) of SFSPB_Register
+   type SFSPB_Registers is array (0 .. 6) of aliased SFS_Register(Normal_Drive)
      with Volatile;
-
-   --  Select pin function.
-   type SFSPC_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSPC_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSPC_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSPC_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSPC_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSPC_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSPC_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSPC_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSPC_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSPC_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSPC_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSPC_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSPC_RESERVED_Field is LPC43_SVD.UInt24;
 
    --  Pin configuration register for pins PC
-   type SFSPC_Register is record
-      --  Select pin function.
-      MODE     : SFSPC_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSPC_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSPC_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSPC_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSPC_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSPC_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSPC_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSPC_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins PC
-   type SFSPC_Registers is array (0 .. 14) of SFSPC_Register
+   type SFSPC_Registers is array (0 .. 14) of aliased SFS_Register(Normal_Drive)
      with Volatile;
-
-   --  Select pin function.
-   type SFSPD_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSPD_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSPD_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSPD_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSPD_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSPD_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSPD_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSPD_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSPD_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSPD_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSPD_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSPD_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSPD_RESERVED_Field is LPC43_SVD.UInt24;
 
    --  Pin configuration register for pins PD
-   type SFSPD_Register is record
-      --  Select pin function.
-      MODE     : SFSPD_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSPD_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSPD_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSPD_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSPD_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSPD_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSPD_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSPD_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins PD
-   type SFSPD_Registers is array (0 .. 16) of SFSPD_Register
+   type SFSPD_Registers is array (0 .. 16) of aliased SFS_Register(Normal_Drive)
      with Volatile;
-
-   --  Select pin function.
-   type SFSPE_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSPE_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSPE_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSPE_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSPE_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSPE_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSPE_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSPE_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSPE_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSPE_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSPE_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSPE_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSPE_RESERVED_Field is LPC43_SVD.UInt24;
 
    --  Pin configuration register for pins PE
-   type SFSPE_Register is record
-      --  Select pin function.
-      MODE     : SFSPE_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSPE_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSPE_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSPE_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSPE_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSPE_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSPE_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSPE_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins PE
-   type SFSPE_Registers is array (0 .. 15) of SFSPE_Register
+   type SFSPE_Registers is array (0 .. 15) of aliased SFS_Register(Normal_Drive)
      with Volatile;
 
-   --  Select pin function.
-   type SFSPF_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSPF_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSPF_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down.Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSPF_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSPF_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSPF_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Select Slew rate.
-   type SFSPF_ENUM_3 is
-     (
-      --  Slow (low noise with medium speed)
-      Slow_Low_Noise_With,
-      --  Fast (medium noise with fast speed)
-      Fast_Medium_Noise_W)
-     with Size => 1;
-   for SFSPF_ENUM_3 use
-     (Slow_Low_Noise_With => 0,
-      Fast_Medium_Noise_W => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSPF_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSPF_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSPF_ENUM_5 is
-     (
-      --  Enable input glitch filter
-      Enable_Input_Glitch,
-      --  Disable input glitch filter
-      Disable_Input_Glitch)
-     with Size => 1;
-   for SFSPF_ENUM_5 use
-     (Enable_Input_Glitch => 0,
-      Disable_Input_Glitch => 1);
-
-   subtype SFSPF_RESERVED_Field is LPC43_SVD.UInt24;
-
    --  Pin configuration register for pins PF
-   type SFSPF_Register is record
-      --  Select pin function.
-      MODE     : SFSPF_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSPF_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSPF_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Select Slew rate.
-      EHS      : SFSPF_ENUM_3 := LPC43_SVD.SCU.Slow_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSPF_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSPF_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Glitch;
-      --  Reserved
-      RESERVED : SFSPF_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSPF_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins PF
-   type SFSPF_Registers is array (0 .. 11) of SFSPF_Register
+   type SFSPF_Registers is array (0 .. 11) of aliased SFS_Register(Normal_Drive)
      with Volatile;
 
-   --  Select pin function.
-   type SFSCLK_ENUM is
-     (
-      --  Function 0 (default)
-      Function_0_Default,
-      --  Function 1
-      Function_1,
-      --  Function 2
-      Function_2,
-      --  Function 3
-      Function_3,
-      --  Function 4
-      Function_4,
-      --  Function 5
-      Function_5,
-      --  Function 6
-      Function_6,
-      --  Function 7
-      Function_7)
-     with Size => 3;
-   for SFSCLK_ENUM use
-     (Function_0_Default => 0,
-      Function_1 => 1,
-      Function_2 => 2,
-      Function_3 => 3,
-      Function_4 => 4,
-      Function_5 => 5,
-      Function_6 => 6,
-      Function_7 => 7);
-
-   --  Enable pull-down resistor at pad.
-   type SFSCLK_ENUM_1 is
-     (
-      --  Disable pull-down.
-      Disable_Pull_Down,
-      --  Enable pull-down. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Down)
-     with Size => 1;
-   for SFSCLK_ENUM_1 use
-     (Disable_Pull_Down => 0,
-      Enable_Pull_Down => 1);
-
-   --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-   --  enabled at reset.
-   type SFSCLK_ENUM_2 is
-     (
-      --  Enable pull-up. Enable both pull-down resistor and pull-up resistor
-      --  for repeater mode.
-      Enable_Pull_Up,
-      --  Disable pull-up.
-      Disable_Pull_Up)
-     with Size => 1;
-   for SFSCLK_ENUM_2 use
-     (Enable_Pull_Up => 0,
-      Disable_Pull_Up => 1);
-
-   --  Slew rate
-   type SFSCLK_ENUM_3 is
-     (
-      --  Fast (low noise with fast speed)
-      Fast_Low_Noise_With,
-      --  High-speed (medium noise with high speed)
-      High_Speed_Medium_N)
-     with Size => 1;
-   for SFSCLK_ENUM_3 use
-     (Fast_Low_Noise_With => 0,
-      High_Speed_Medium_N => 1);
-
-   --  Input buffer enable. The input buffer is disabled by default at reset
-   --  and must be enabled for receiving.
-   type SFSCLK_ENUM_4 is
-     (
-      --  Disable input buffer
-      Disable_Input_Buffer,
-      --  Enable input buffer
-      Enable_Input_Buffer)
-     with Size => 1;
-   for SFSCLK_ENUM_4 use
-     (Disable_Input_Buffer => 0,
-      Enable_Input_Buffer => 1);
-
-   --  Input glitch filter. Disable the input glitch filter for clocking
-   --  signals higher than 30 MHz.
-   type SFSCLK_ENUM_5 is
-     (
-      --  Enable input filter
-      Enable_Input_Filter,
-      --  Disable input filter
-      Disable_Input_Filter)
-     with Size => 1;
-   for SFSCLK_ENUM_5 use
-     (Enable_Input_Filter => 0,
-      Disable_Input_Filter => 1);
-
-   subtype SFSCLK_RESERVED_Field is LPC43_SVD.UInt24;
-
    --  Pin configuration register for pins CLK
-   type SFSCLK_Register is record
-      --  Select pin function.
-      MODE     : SFSCLK_ENUM := LPC43_SVD.SCU.Function_0_Default;
-      --  Enable pull-down resistor at pad.
-      EPD      : SFSCLK_ENUM_1 := LPC43_SVD.SCU.Disable_Pull_Down;
-      --  Disable pull-up resistor at pad. By default, the pull-up resistor is
-      --  enabled at reset.
-      EPUN     : SFSCLK_ENUM_2 := LPC43_SVD.SCU.Enable_Pull_Up;
-      --  Slew rate
-      EHS      : SFSCLK_ENUM_3 := LPC43_SVD.SCU.Fast_Low_Noise_With;
-      --  Input buffer enable. The input buffer is disabled by default at reset
-      --  and must be enabled for receiving.
-      EZI      : SFSCLK_ENUM_4 := LPC43_SVD.SCU.Disable_Input_Buffer;
-      --  Input glitch filter. Disable the input glitch filter for clocking
-      --  signals higher than 30 MHz.
-      ZIF      : SFSCLK_ENUM_5 := LPC43_SVD.SCU.Enable_Input_Filter;
-      --  Reserved
-      RESERVED : SFSCLK_RESERVED_Field := 16#0#;
-   end record
-     with Volatile_Full_Access, Size => 32,
-          Bit_Order => System.Low_Order_First;
-
-   for SFSCLK_Register use record
-      MODE     at 0 range 0 .. 2;
-      EPD      at 0 range 3 .. 3;
-      EPUN     at 0 range 4 .. 4;
-      EHS      at 0 range 5 .. 5;
-      EZI      at 0 range 6 .. 6;
-      ZIF      at 0 range 7 .. 7;
-      RESERVED at 0 range 8 .. 31;
-   end record;
-
-   --  Pin configuration register for pins CLK
-   type SFSCLK_Registers is array (0 .. 3) of SFSCLK_Register
+   type SFSCLK_Registers is array (0 .. 3) of aliased SFS_Register(High_Speed)
      with Volatile;
 
    --  Differential data input AIP/AIM.
@@ -2833,6 +332,8 @@ package LPC43_SVD.SCU is
      (Pull_Down_Disconnect => 0,
       Pull_Down_Connected => 1);
 
+   subtype SFSUSB_RESERVED_Field is LPC43_SVD.Bit;
+
    --  Power mode.
    type SFSUSB_ENUM_3 is
      (
@@ -2862,7 +363,7 @@ package LPC43_SVD.SCU is
      (Vbus_Signal_Low_Or_I => 0,
       Vbus_Signal_High_Or => 1);
 
-   subtype SFSUSB_RESERVED_Field is LPC43_SVD.UInt26;
+   subtype SFSUSB_RESERVED_Field_1 is LPC43_SVD.UInt26;
 
    --  Pin configuration register for pins USB1_DM and USB1_DP
    type SFSUSB_Register is record
@@ -2871,11 +372,13 @@ package LPC43_SVD.SCU is
       --  Control signal for differential input or single input.
       USB_ESEA   : SFSUSB_ENUM_1 := LPC43_SVD.SCU.Single_Input;
       --  Enable pull-down connect.
-      USB_EPD    : SFSUSB_ENUM_2 := LPC43_SVD.SCU.Pull_Down_Disconnect;
+      USB_EPD    : SFSUSB_ENUM_2 :=
+                    LPC43_SVD.SCU.Pull_Down_Disconnect;
       --  Reserved
-      RESERVED   : Boolean := False;
+      RESERVED   : SFSUSB_RESERVED_Field := 16#0#;
       --  Power mode.
-      USB_EPWR   : SFSUSB_ENUM_3 := LPC43_SVD.SCU.Power_Saving_Mode_S;
+      USB_EPWR   : SFSUSB_ENUM_3 :=
+                    LPC43_SVD.SCU.Power_Saving_Mode_S;
       --  Enable the vbus_valid signal. This signal is monitored by the USB1
       --  block. Use this bit for software de-bouncing of the VBUS sense signal
       --  or to indicate the VBUS state to the USB1 controller when the VBUS
@@ -2883,9 +386,10 @@ package LPC43_SVD.SCU is
       --  SFSP2_5 register. The setting of this bit has no effect if the
       --  USB1_VBUS function of pin P2_5 is enabled through the SFSP2_5
       --  register.
-      USB_VBUS   : SFSUSB_ENUM_4 := LPC43_SVD.SCU.Vbus_Signal_Low_Or_I;
+      USB_VBUS   : SFSUSB_ENUM_4 :=
+                    LPC43_SVD.SCU.Vbus_Signal_Low_Or_I;
       --  Reserved
-      RESERVED_1 : SFSUSB_RESERVED_Field := 16#0#;
+      RESERVED_1 : SFSUSB_RESERVED_Field_1 := 16#0#;
    end record
      with Volatile_Full_Access, Size => 32,
           Bit_Order => System.Low_Order_First;
@@ -2912,6 +416,8 @@ package LPC43_SVD.SCU is
      (SFSI2C0_ENUM_50_Ns_Glitch_Filter => 0,
       SFSI2C0_ENUM_3_Ns_Glitch_Filter => 1);
 
+   subtype SFSI2C0_RESERVED_Field is LPC43_SVD.Bit;
+
    --  Select I2C mode for the SCL pin.
    type SFSI2C0_ENUM_1 is
      (
@@ -2937,7 +443,7 @@ package LPC43_SVD.SCU is
      (Disabled => 0,
       Enabled => 1);
 
-   subtype SFSI2C0_RESERVED_Field is LPC43_SVD.UInt3;
+   subtype SFSI2C0_RESERVED_Field_1 is LPC43_SVD.UInt3;
 
    --  Enable or disable input glitch filter for the SCL pin. The filter time
    --  constant is determined by bit EFP.
@@ -2952,7 +458,7 @@ package LPC43_SVD.SCU is
      (Enable_Input_Filter => 0,
       Disable_Input_Filter => 1);
 
-   subtype SFSI2C0_RESERVED_Field_1 is LPC43_SVD.UInt16;
+   subtype SFSI2C0_RESERVED_Field_2 is LPC43_SVD.UInt16;
 
    --  Pin configuration register for I2C0-bus pins
    type SFSI2C0_Register is record
@@ -2960,34 +466,36 @@ package LPC43_SVD.SCU is
       SCL_EFP    : SFSI2C0_ENUM :=
                     LPC43_SVD.SCU.SFSI2C0_ENUM_50_Ns_Glitch_Filter;
       --  Reserved. Always write a 0 to this bit.
-      RESERVED   : Boolean := False;
+      RESERVED   : SFSI2C0_RESERVED_Field := 16#0#;
       --  Select I2C mode for the SCL pin.
       SCL_EHD    : SFSI2C0_ENUM_1 := LPC43_SVD.SCU.Standardfast_Mode;
       --  Enable the input receiver for the SCL pin. Always write a 1 to this
       --  bit when using the I2C0.
       SCL_EZI    : SFSI2C0_ENUM_2 := LPC43_SVD.SCU.Disabled;
       --  Reserved
-      RESERVED_1 : SFSI2C0_RESERVED_Field := 16#0#;
+      RESERVED_1 : SFSI2C0_RESERVED_Field_1 := 16#0#;
       --  Enable or disable input glitch filter for the SCL pin. The filter
       --  time constant is determined by bit EFP.
-      SCL_ZIF    : SFSI2C0_ENUM_3 := LPC43_SVD.SCU.Enable_Input_Filter;
+      SCL_ZIF    : SFSI2C0_ENUM_3 :=
+                    LPC43_SVD.SCU.Enable_Input_Filter;
       --  Select input glitch filter time constant for the SDA pin.
       SDA_EFP    : SFSI2C0_ENUM :=
                     LPC43_SVD.SCU.SFSI2C0_ENUM_50_Ns_Glitch_Filter;
       --  Reserved. Always write a 0 to this bit.
-      RESERVED_2 : Boolean := False;
+      RESERVED_2 : SFSI2C0_RESERVED_Field := 16#0#;
       --  Select I2C mode for the SDA pin.
       SDA_EHD    : SFSI2C0_ENUM_1 := LPC43_SVD.SCU.Standardfast_Mode;
       --  Enable the input receiver for the SDA pin. Always write a 1 to this
       --  bit when using the I2C0.
       SDA_EZI    : SFSI2C0_ENUM_2 := LPC43_SVD.SCU.Disabled;
       --  Reserved
-      RESERVED_3 : SFSI2C0_RESERVED_Field := 16#0#;
+      RESERVED_3 : SFSI2C0_RESERVED_Field_1 := 16#0#;
       --  Enable or disable input glitch filter for the SDA pin. The filter
       --  time constant is determined by bit SDA_EFP.
-      SDA_ZIF    : SFSI2C0_ENUM_3 := LPC43_SVD.SCU.Enable_Input_Filter;
+      SDA_ZIF    : SFSI2C0_ENUM_3 :=
+                    LPC43_SVD.SCU.Enable_Input_Filter;
       --  Reserved
-      RESERVED_4 : SFSI2C0_RESERVED_Field_1 := 16#0#;
+      RESERVED_4 : SFSI2C0_RESERVED_Field_2 := 16#0#;
    end record
      with Volatile_Full_Access, Size => 32,
           Bit_Order => System.Low_Order_First;
@@ -3023,19 +531,26 @@ package LPC43_SVD.SCU is
    --  ADC0 function select register
    type ENAIO0_Register is record
       --  Select ADC0_0
-      ADC0_0        : ENAIO0_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC0_0        : ENAIO0_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC0_1
-      ADC0_1        : ENAIO0_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC0_1        : ENAIO0_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC0_2
-      ADC0_2        : ENAIO0_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC0_2        : ENAIO0_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC0_3
-      ADC0_3        : ENAIO0_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC0_3        : ENAIO0_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC0_4
-      ADC0_4        : ENAIO0_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC0_4        : ENAIO0_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC0_5
-      ADC0_5        : ENAIO0_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC0_5        : ENAIO0_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC0_6
-      ADC0_6        : ENAIO0_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC0_6        : ENAIO0_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  unspecified
       Reserved_7_31 : LPC43_SVD.UInt25 := 16#0#;
    end record
@@ -3068,21 +583,29 @@ package LPC43_SVD.SCU is
    --  ADC1 function select register
    type ENAIO1_Register is record
       --  Select ADC1_0
-      ADC1_0        : ENAIO1_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC1_0        : ENAIO1_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC1_1
-      ADC1_1        : ENAIO1_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC1_1        : ENAIO1_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC1_2
-      ADC1_2        : ENAIO1_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC1_2        : ENAIO1_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC1_3
-      ADC1_3        : ENAIO1_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC1_3        : ENAIO1_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC1_4
-      ADC1_4        : ENAIO1_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC1_4        : ENAIO1_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC1_5
-      ADC1_5        : ENAIO1_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC1_5        : ENAIO1_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC1_6
-      ADC1_6        : ENAIO1_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC1_6        : ENAIO1_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  Select ADC1_7.
-      ADC1_7        : ENAIO1_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      ADC1_7        : ENAIO1_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  unspecified
       Reserved_8_31 : LPC43_SVD.UInt24 := 16#0#;
    end record
@@ -3131,14 +654,16 @@ package LPC43_SVD.SCU is
    --  Analog function select register
    type ENAIO2_Register is record
       --  Select DAC
-      DAC           : ENAIO2_ENUM := LPC43_SVD.SCU.Digital_Function_Sel;
+      DAC           : ENAIO2_ENUM :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  unspecified
       Reserved_1_3  : LPC43_SVD.UInt3 := 16#0#;
       --  Select band gap output. To measure the band gap, disable the pull-up
       --  on pin PF_7 and connect PF_7 to the digital pad. Do not use the
       --  digital pad nor the ADC1_7 on the board when measuring the band gap
       --  (see Section 15.4.8.1).
-      BG            : ENAIO2_ENUM_1 := LPC43_SVD.SCU.Digital_Function_Sel;
+      BG            : ENAIO2_ENUM_1 :=
+                       LPC43_SVD.SCU.Digital_Function_Sel;
       --  unspecified
       Reserved_5_31 : LPC43_SVD.UInt27 := 16#0#;
    end record
@@ -3367,42 +892,24 @@ package LPC43_SVD.SCU is
       SFSP0       : aliased SFSP0_Registers;
       --  Pin configuration register for pins P1
       SFSP1       : aliased SFSP1_Registers;
-      --  Pin configuration register for pins P1_17
-      SFSP1_17    : aliased SFSP1_17_Register;
-      --  Pin configuration register for pins P1
-      SFSP1_1     : aliased SFSP_Registers;
       --  Pin configuration register for pins P2
-      SFSP2       : aliased SFSP_Registers;
-      --  Pin configuration register for pins P2
-      SFSP2_1     : aliased SFSP2_Registers;
-      --  Pin configuration register for pins P2
-      SFSP2_2     : aliased SFSP2_Registers_1;
+      SFSP2       : aliased SFSP2_Registers;
       --  Pin configuration register for pins P3
-      SFSP3       : aliased SFSP_Registers;
-      --  Pin configuration register for pins P3
-      SFSP3_3     : aliased SFSP3_3_Register;
-      --  Pin configuration register for pins P3
-      SFSP3_1     : aliased SFSP3_Registers;
+      SFSP3       : aliased SFSP3_Registers;
       --  Pin configuration register for pins P4
       SFSP4       : aliased SFSP4_Registers;
       --  Pin configuration register for pins P5
-      SFSP5       : aliased SFSP_Registers_1;
+      SFSP5       : aliased SFSP5_Registers;
       --  Pin configuration register for pins P6
       SFSP6       : aliased SFSP6_Registers;
       --  Pin configuration register for pins P7
-      SFSP7       : aliased SFSP_Registers_1;
+      SFSP7       : aliased SFSP7_Registers;
       --  Pin configuration register for pins P8
-      SFSP8       : aliased SFSP_Registers;
-      --  Pin configuration register for pins P8
-      SFSP8_1     : aliased SFSP8_Registers;
+      SFSP8       : aliased SFSP8_Registers;
       --  Pin configuration register for pins P9
       SFSP9       : aliased SFSP9_Registers;
       --  Pin configuration register for pins PA
-      SFSPA_0     : aliased SFSPA_0_Register;
-      --  Pin configuration register for pins PA
       SFSPA       : aliased SFSPA_Registers;
-      --  Pin configuration register for pins PA
-      SFSPA_4     : aliased SFSPA_4_Register;
       --  Pin configuration register for pins PB
       SFSPB       : aliased SFSPB_Registers;
       --  Pin configuration register for pins PC
@@ -3438,25 +945,16 @@ package LPC43_SVD.SCU is
 
    for SCU_Peripheral use record
       SFSP0       at 16#0# range 0 .. 63;
-      SFSP1       at 16#80# range 0 .. 543;
-      SFSP1_17    at 16#C4# range 0 .. 31;
-      SFSP1_1     at 16#C8# range 0 .. 95;
-      SFSP2       at 16#100# range 0 .. 95;
-      SFSP2_1     at 16#10C# range 0 .. 95;
-      SFSP2_2     at 16#118# range 0 .. 223;
-      SFSP3       at 16#180# range 0 .. 95;
-      SFSP3_3     at 16#18C# range 0 .. 31;
-      SFSP3_1     at 16#190# range 0 .. 159;
+      SFSP1       at 16#80# range 0 .. 671;
+      SFSP2       at 16#100# range 0 .. 447;
+      SFSP3       at 16#180# range 0 .. 287;
       SFSP4       at 16#200# range 0 .. 351;
       SFSP5       at 16#280# range 0 .. 255;
       SFSP6       at 16#300# range 0 .. 415;
       SFSP7       at 16#380# range 0 .. 255;
-      SFSP8       at 16#400# range 0 .. 95;
-      SFSP8_1     at 16#40C# range 0 .. 191;
+      SFSP8       at 16#400# range 0 .. 287;
       SFSP9       at 16#480# range 0 .. 223;
-      SFSPA_0     at 16#500# range 0 .. 31;
-      SFSPA       at 16#504# range 0 .. 95;
-      SFSPA_4     at 16#510# range 0 .. 31;
+      SFSPA       at 16#500# range 0 .. 159;
       SFSPB       at 16#580# range 0 .. 223;
       SFSPC       at 16#600# range 0 .. 479;
       SFSPD       at 16#680# range 0 .. 543;
