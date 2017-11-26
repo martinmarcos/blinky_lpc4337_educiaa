@@ -33,14 +33,50 @@ procedure Blinky is
       --  Configuration.Resistors   := Floating;
       --  Configure_IO (All_LEDs, Configuration);
 
-      SCU_Periph.SFSP2_2 (6).EPUN := Enable_Pull_Up;
-      SCU_Periph.SFSP2_2 (6).EZI := Enable_Input_Buffer;
-      SCU_Periph.SFSP2_2 (6).MODE := Function_0_Default;
+      SCU_Periph.SFSP2.Pins_0_2 (0).EPUN := Enable_Pull_Up;
+      SCU_Periph.SFSP2.Pins_0_2 (0).EPD := Disable_Pull_Down;
+      SCU_Periph.SFSP2.Pins_0_2 (0).EZI := Enable_Input_Buffer;
+      SCU_Periph.SFSP2.Pins_0_2 (0).MODE := Function_4;
+
+      SCU_Periph.SFSP2.Pins_0_2 (1).EPUN := Enable_Pull_Up;
+      SCU_Periph.SFSP2.Pins_0_2 (1).EPD := Disable_Pull_Down;
+      SCU_Periph.SFSP2.Pins_0_2 (1).EZI := Enable_Input_Buffer;
+      SCU_Periph.SFSP2.Pins_0_2 (1).MODE := Function_4;
+
+      SCU_Periph.SFSP2.Pins_0_2 (2).EPUN := Enable_Pull_Up;
+      SCU_Periph.SFSP2.Pins_0_2 (2).EPD := Disable_Pull_Down;
+      SCU_Periph.SFSP2.Pins_0_2 (2).EZI := Enable_Input_Buffer;
+      SCU_Periph.SFSP2.Pins_0_2 (2).MODE := Function_4;
+
+      GPIO_PORT_Periph.DIR (5) := (As_Array => True,
+                        Arr => (0 => True, 1 => True, 2 => True, others => <>));
+      GPIO_PORT_Periph.CLR (5) := (As_Array => True,
+                        Arr => (0 => True, 1 => True, 2 => True, others => <>));
+
+      SCU_Periph.SFSP2.Pins_6_13 (10).EPUN := Enable_Pull_Up;
+      SCU_Periph.SFSP2.Pins_6_13 (10).EPD := Disable_Pull_Down;
+      SCU_Periph.SFSP2.Pins_6_13 (10).EZI := Enable_Input_Buffer;
+      SCU_Periph.SFSP2.Pins_6_13 (10).MODE := Function_0_Default;
+
+      GPIO_PORT_Periph.DIR (0) := (As_Array => True,
+                                             Arr => (14 => True, others => <>));
+      GPIO_PORT_Periph.CLR (0) := (As_Array => True,
+                                             Arr => (14 => True, others => <>));
+
+      SCU_Periph.SFSP2.Pins_6_13 (11).EPUN := Enable_Pull_Up;
+      SCU_Periph.SFSP2.Pins_6_13 (11).EPD := Disable_Pull_Down;
+      SCU_Periph.SFSP2.Pins_6_13 (11).EZI := Enable_Input_Buffer;
+      SCU_Periph.SFSP2.Pins_6_13 (11).MODE := Function_0_Default;
+
+      SCU_Periph.SFSP2.Pins_6_13 (12).EPUN := Enable_Pull_Up;
+      SCU_Periph.SFSP2.Pins_6_13 (12).EPD := Disable_Pull_Down;
+      SCU_Periph.SFSP2.Pins_6_13 (12).EZI := Enable_Input_Buffer;
+      SCU_Periph.SFSP2.Pins_6_13 (12).MODE := Function_0_Default;
 
       GPIO_PORT_Periph.DIR (1) := (As_Array => True,
-                                   Arr => (12 => True, others => <>));
+                                 Arr => (11 => True, 12 => True, others => <>));
       GPIO_PORT_Periph.CLR (1) := (As_Array => True,
-                                   Arr => (12 => True, others => <>));
+                                 Arr => (11 => True, 12 => True, others => <>));
 
    end Initialize_LEDs;
 
@@ -50,13 +86,9 @@ begin
 
    loop
       --  Toggle (All_LEDs);
-      if GPIO_PORT_Periph.SET (1).Arr (12) then
-         GPIO_PORT_Periph.CLR (1) := (As_Array => True,
-                                      Arr => (12 => True, others => <>));
-      else
-         GPIO_PORT_Periph.SET (1) := (As_Array => True,
-                                      Arr => (12 => True, others => <>));
-      end if;
+
+      GPIO_PORT_Periph.NOT_k (1) := (As_Array => True,
+                                 Arr => (12 => True, others => <>));
 
       Next_Release := Next_Release + Period;
       delay until Next_Release;
